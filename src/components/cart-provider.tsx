@@ -6,10 +6,10 @@ import { createContext, useContext, useReducer, type ReactNode } from "react"
 
 interface CartItem {
     id: number
-    name: string
-    price: number
-    quantity: number
-    image: string
+    nombre: string
+    precio: number
+    cantidad: number
+    imagen: string
 }
 
 interface CartState {
@@ -19,7 +19,7 @@ interface CartState {
 type CartAction =
     | { type: "ADD_ITEM"; payload: CartItem }
     | { type: "REMOVE_ITEM"; payload: number }
-    | { type: "UPDATE_QUANTITY"; payload: { id: number; quantity: number } }
+    | { type: "UPDATE_QUANTITY"; payload: { id: number; cantidad: number } }
     | { type: "CLEAR_CART" }
 
 const CartContext = createContext<{
@@ -35,7 +35,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
                 return {
                     ...state,
                     items: state.items.map((item) =>
-                        item.id === action.payload.id ? { ...item, quantity: item.quantity + action.payload.quantity } : item,
+                        item.id === action.payload.id ? { ...item, cantidad: item.cantidad + action.payload.cantidad } : item,
                     ),
                 }
             }
@@ -53,7 +53,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
             return {
                 ...state,
                 items: state.items.map((item) =>
-                    item.id === action.payload.id ? { ...item, quantity: action.payload.quantity } : item,
+                    item.id === action.payload.id ? { ...item, cantidad: action.payload.cantidad } : item,
                 ),
             }
         case "CLEAR_CART":

@@ -2,10 +2,10 @@
 
 interface CartItem {
     id: number
-    name: string
-    price: number
-    quantity: number
-    image: string
+    nombre: string
+    precio: number
+    cantidad: number
+    imagen: string
 }
 
 export function useCart() {
@@ -19,11 +19,11 @@ export function useCart() {
         dispatch({ type: "REMOVE_ITEM", payload: id })
     }
 
-    const updateQuantity = (id: number, quantity: number) => {
-        if (quantity <= 0) {
+    const updateQuantity = (id: number, cantidad: number) => {
+        if (cantidad <= 0) {
             removeItem(id)
         } else {
-            dispatch({ type: "UPDATE_QUANTITY", payload: { id, quantity } })
+            dispatch({ type: "UPDATE_QUANTITY", payload: { id, cantidad } })
         }
     }
 
@@ -31,10 +31,15 @@ export function useCart() {
         dispatch({ type: "CLEAR_CART" })
     }
 
-    const total = state.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+    // Calcular total de forma segura
+    const total = (state?.items || []).reduce((sum, item) => {
+        const itemPrice = item?.precio || 0
+        const itemQuantity = item?.cantidad || 0
+        return sum + itemPrice * itemQuantity
+    }, 0)
 
     return {
-        items: state.items,
+        items: state?.items || [],
         addItem,
         removeItem,
         updateQuantity,

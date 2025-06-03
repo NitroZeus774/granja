@@ -11,7 +11,7 @@ export function AboutSection() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                     <div>
                         <Image
-                            src="/placeholder.svg?height=400&width=600"
+                            src="https://images.pexels.com/photos/1198507/pexels-photo-1198507.jpeg?auto=compress&cs=tinysrgb&w=600"
                             alt="Nuestra Granja"
                             width={600}
                             height={400}

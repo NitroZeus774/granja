@@ -1,9 +1,7 @@
-import type React from "react"
+﻿import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
-import { Navbar } from "@/components/navbar"
-import { Footer } from "@/components/footer"
 import { CartProvider } from "@/components/cart-provider"
 import { Toaster } from "@/components/ui/toaster"
 
@@ -24,9 +22,7 @@ export default function RootLayout({
             <body className={inter.className}>
                 <CartProvider>
                     <div className="min-h-screen flex flex-col">
-                        <Navbar />
                         <main className="flex-1">{children}</main>
-                        <Footer />
                     </div>
                     <Toaster />
                 </CartProvider>

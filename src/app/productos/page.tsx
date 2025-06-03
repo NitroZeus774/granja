@@ -1,24 +1,46 @@
-﻿import { ProductsGrid } from "@/components/products-grid"
+﻿"use client"
+
+import { ProductsGrid } from "@/components/products-grid"
 import { ProductsFilter } from "@/components/products-filter"
-import { Suspense } from "react"
+import { Footer } from "@/components/footer"
+import { Navbar } from "@/components/navbar"
+import { useState } from "react"
 
-interface ProductsPageProps {
-    searchParams: { categoria?: string; orden?: string }
-}
+export default function ProductsPage() {
+    const [selectedCategory, setSelectedCategory] = useState<string>("todos")
+    const [selectedSort, setSelectedSort] = useState<string>("default")
 
-export default function ProductsPage({ searchParams }: ProductsPageProps) {
+    const handleCategoryChange = (category: string) => {
+        setSelectedCategory(category)
+    }
+
+    const handleSortChange = (sort: string) => {
+        setSelectedSort(sort)
+    }
+
     return (
-        <div className="container mx-auto px-4 py-8">
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                <div className="lg:col-span-1">
-                    <ProductsFilter selectedCategory={searchParams.categoria} />
+        <>
+            <Navbar />
+                <div className="container mx-auto px-4 py-8">
+                    <h1 className="text-3xl font-bold text-[#5d8c47] mb-8">Nuestros Productos</h1>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                        <div className="lg:col-span-1">
+                            <ProductsFilter
+                                selectedCategory={selectedCategory}
+                                onCategoryChange={handleCategoryChange}
+                                onSortChange={handleSortChange}
+                            />
+                        </div>
+                        <div className="lg:col-span-3">
+                            <ProductsGrid
+                                categoria={selectedCategory === "todos" ? undefined : selectedCategory}
+                                orden={selectedSort === "default" ? undefined : selectedSort}
+                            />
+                        </div>
+                    </div>
                 </div>
-                <div className="lg:col-span-3">
-                    <Suspense fallback={<div>Cargando productos...</div>}>
-                        <ProductsGrid categoria={searchParams.categoria} orden={searchParams.orden} />
-                    </Suspense>
-                </div>
-            </div>
-        </div>
+            <Footer />
+        </>
     )
 }

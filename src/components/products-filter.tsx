@@ -1,24 +1,32 @@
 ﻿"use client"
 
-import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useEffect, useState } from "react"
 
 interface ProductsFilterProps {
     selectedCategory?: string
+    onCategoryChange: (category: string) => void
+    onSortChange: (sort: string) => void
 }
 
-export function ProductsFilter({ selectedCategory }: ProductsFilterProps) {
-    const router = useRouter()
-    const searchParams = useSearchParams()
+export function ProductsFilter({ selectedCategory, onCategoryChange, onSortChange }: ProductsFilterProps) {
+    const [categories, setCategories] = useState<{ id: number; nombre: string }[]>([])
+    const [currentSort, setCurrentSort] = useState("default")
 
-    const categories = [
-        { value: "todos", label: "Todas las categorías" },
-        { value: "verduras", label: "Verduras" },
-        { value: "lácteos", label: "Lácteos" },
-        { value: "endulzantes", label: "Endulzantes" },
-        { value: "conservas", label: "Conservas" },
-    ]
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const response = await fetch("/api/categorias")
+                const promise = await response.json()
+                const categorias: { id: number; nombre: string }[] = promise.categorias
+                setCategories([{ id: 0, nombre: "todos" }, ...categorias])
+            } catch (error) {
+                console.error("Error fetching categories:", error)
+            }
+        }
+        fetchCategories()
+    }, [])
 
     const sortOptions = [
         { value: "default", label: "Ordenar por" },
@@ -28,23 +36,12 @@ export function ProductsFilter({ selectedCategory }: ProductsFilterProps) {
     ]
 
     const handleCategoryChange = (category: string) => {
-        const params = new URLSearchParams(searchParams.toString())
-        if (category === "todos") {
-            params.delete("categoria")
-        } else {
-            params.set("categoria", category)
-        }
-        router.push(`/productos?${params.toString()}`)
+        onCategoryChange(category)
     }
 
     const handleSortChange = (sort: string) => {
-        const params = new URLSearchParams(searchParams.toString())
-        if (sort === "default" || !sort) {
-            params.delete("orden")
-        } else {
-            params.set("orden", sort)
-        }
-        router.push(`/productos?${params.toString()}`)
+        setCurrentSort(sort)
+        onSortChange(sort)
     }
 
     return (
@@ -58,19 +55,19 @@ export function ProductsFilter({ selectedCategory }: ProductsFilterProps) {
                     <div className="space-y-2">
                         {categories.map((category) => (
                             <Button
-                                key={category.value}
+                                key={category.id}
                                 variant={
-                                    selectedCategory === category.value || (!selectedCategory && category.value === "todos")
+                                    selectedCategory === category.nombre || (!selectedCategory && category.nombre === "todos")
                                         ? "default"
                                         : "ghost"
                                 }
-                                className={`w-full justify-start ${selectedCategory === category.value || (!selectedCategory && category.value === "todos")
+                                className={`w-full justify-start ${selectedCategory === category.nombre || (!selectedCategory && category.nombre === "todos")
                                         ? "btn-primary"
                                         : "text-gray-600 hover:text-[#5d8c47]"
                                     }`}
-                                onClick={() => handleCategoryChange(category.value)}
+                                onClick={() => handleCategoryChange(category.nombre)}
                             >
-                                {category.label}
+                                {category.nombre.charAt(0).toUpperCase() + category.nombre.slice(1)}
                             </Button>
                         ))}
                     </div>
@@ -79,7 +76,7 @@ export function ProductsFilter({ selectedCategory }: ProductsFilterProps) {
                 {/* Sort */}
                 <div>
                     <h4 className="font-medium mb-3">Ordenar</h4>
-                    <Select onValueChange={handleSortChange} defaultValue={searchParams.get("orden") || "default"}>
+                    <Select onValueChange={handleSortChange} value={currentSort}>
                         <SelectTrigger>
                             <SelectValue placeholder="Ordenar por" />
                         </SelectTrigger>
@@ -93,32 +90,18 @@ export function ProductsFilter({ selectedCategory }: ProductsFilterProps) {
                     </Select>
                 </div>
 
-                {/* Price Range */}
+                {/* Clear Filters */}
                 <div>
-                    <h4 className="font-medium mb-3">Rango de Precio</h4>
-                    <div className="space-y-2">
-                        <Button
-                            variant="ghost"
-                            className="w-full justify-start text-gray-600 hover:text-[#5d8c47]"
-                            onClick={() => handleSortChange("precio-asc")}
-                        >
-                            Menos de $10,000
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            className="w-full justify-start text-gray-600 hover:text-[#5d8c47]"
-                            onClick={() => handleSortChange("precio-desc")}
-                        >
-                            $10,000 - $20,000
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            className="w-full justify-start text-gray-600 hover:text-[#5d8c47]"
-                            onClick={() => handleSortChange("precio-desc")}
-                        >
-                            Más de $20,000
-                        </Button>
-                    </div>
+                    <Button
+                        variant="outline"
+                        className="w-full"
+                        onClick={() => {
+                            handleCategoryChange("todos")
+                            handleSortChange("default")
+                        }}
+                    >
+                        Limpiar Filtros
+                    </Button>
                 </div>
             </div>
         </div>
